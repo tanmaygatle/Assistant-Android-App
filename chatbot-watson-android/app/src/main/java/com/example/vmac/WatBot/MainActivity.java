@@ -315,9 +315,53 @@ public class MainActivity extends AppCompatActivity {
                                 outMessage.setMessage((String)responseList.get(0));
                                 outMessage.setId("2");
                             }
-                            
+                            Log.d(TAG, (String)responseList.get(0));
+                            String inputres = (String)responseList.get(0);
+                            if(inputres.charAt(0)=='_'){
+                                String action=    inputres.substring(1,inputres.indexOf(' '));
+                                String name = inputres.substring(inputres.indexOf(' ')+1);
+                                ArrayList permname = new ArrayList<>();
+                                fsmid = new ArrayList<>();
+                                branch = new ArrayList<>();
 
-                            messageArrayList.add(outMessage);
+                                DBHelper dbHelper = new DBHelper(this);
+                                Cursor res = dbHelper.getPermissionsForUser(String userId);
+                                res.moveToFirst();
+                                for(int i = 0 ; i < res.getCount(); i++) {
+                                    int pid=  res.getInt(res.getColumnIndex("pid")));
+                                    Cursor perm = dbHelper.getPermissionData(pid);
+                                    for(int j=0; j<perm.getCount(); j++) {
+                                        permname.add(perm.getString(perm.getColumnIndex("permission_name")));
+                                        perm.moveToNext();
+                                    }
+                                    res.moveToNext();
+                                }
+                                if(permname.contains(action))
+                                if(action.equals("call")&& permname.contains("call")){
+
+
+                                }
+                                if(action.equals("camera")&& permname.contains("camera")){
+                                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                                    startActivity(intent);
+                                }
+                                if(action.equals("mail") && permname.contains("mail")){
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    Uri data = Uri.parse("mailto:?subject=" + " " + "&body=" + " ");
+                                    intent.setData(data);
+                                    startActivity(intent);
+
+                                }
+
+
+
+
+                            }
+                            else{
+                                messageArrayList.add(outMessage);
+                            }
+
+                      //      messageArrayList.add(outMessage);
                         }
 
                         runOnUiThread(new Runnable() {
