@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private MicrophoneHelper microphoneHelper;
     private Logger myLogger;
     private String userId ="";
+    private String userId1 ="";
 
 
 
