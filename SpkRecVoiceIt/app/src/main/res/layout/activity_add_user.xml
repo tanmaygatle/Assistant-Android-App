@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.tanmay.spkrecvoiceit.AddUserActivity"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:id="@+id/ScrollView01"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="vertical">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:orientation="vertical"
+        android:layout_height="fill_parent"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/enter_username_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/enter_username_text"
+            android:textSize="10pt"
+            android:layout_margin="5dp"
+            >
+        </TextView>
+        <EditText
+            android:id="@+id/name_edit_text"
+            android:layout_height="wrap_content"
+            android:hint="@string/username_text"
+            android:inputType="textPersonName"
+            android:layout_width="fill_parent"
+            android:layout_margin="5dp">
+        </EditText>
+        <CheckBox
+            android:id="@+id/checkbox_1"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_1_text"
+            android:layout_width="fill_parent"
+            android:layout_margin="10dp">
+        </CheckBox>
+        <CheckBox
+            android:id="@+id/checkbox_2"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_2_text"
+            android:layout_width="fill_parent"
+            android:layout_margin="10dp">
+        </CheckBox>
+        <CheckBox
+            android:id="@+id/checkbox_3"
+            android:layout_height="wrap_content"
+            android:text="@string/checkbox_3_text"
+            android:layout_width="fill_parent"
+            android:layout_margin="10dp">
+        </CheckBox>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/create_user_button"
+            android:text="@string/create_user_text"
+            android:onClick="ShowPopup"
+            android:layout_margin="10dp"
+            android:background="@drawable/buttonstyle"/>
+    </LinearLayout>
+</ScrollView>
