@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SpkRecVoiceIt</string>
+    <string name="add_user_button_text">Add User</string>
+    <string name="verify_user_button_text">Verify User</string>
+    <string name="enter_username_text">Enter Username to register</string>
+    <string name="username_text">Username</string>
+    <string name="checkbox_1_text">Permission 1</string>
+    <string name="checkbox_2_text">Permission 2</string>
+    <string name="checkbox_3_text">Permission 3</string>
+    <string name="create_user_text">Create User</string>
+    <string name="enrol_user_text">Enrol User</string>
+    <string name="popup_text">Please repeat the sentence three times.\n\n \"<b>Never forget tomorrow is a new day</b>\" \n\nYou may start each time after the beep</string>
+</resources>
