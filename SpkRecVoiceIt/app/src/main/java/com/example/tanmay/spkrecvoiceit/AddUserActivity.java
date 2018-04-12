@@ -22,7 +22,9 @@ import com.voiceit.voiceit2.VoiceItAPI2;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 import cz.msebera.android.httpclient.Header;
+
 
 public class AddUserActivity extends AppCompatActivity{
     public VoiceItAPI2 myVoiceIt2;
@@ -102,6 +104,7 @@ public class AddUserActivity extends AppCompatActivity{
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                         try {
                                             Log.d(TAG,"JSONResult createVoiceEnrollment1: "+ response.toString());
+
                                             showEnrollmentStatus(true, "Enrollment Successful",mEnrolButton);
                                             String name = nameEditText.getText().toString();
                                             dbHelper.addUser(userID,name);

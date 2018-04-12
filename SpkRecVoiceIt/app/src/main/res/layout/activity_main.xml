@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.tanmay.spkrecvoiceit.MainActivity">
+    tools:context="com.example.tanmay.spkrecvoiceit.MainActivity"
+    android:id="@+id/main_layout">
     <Button
         android:id="@+id/add_user_button"
         android:layout_width="wrap_content"
@@ -12,15 +13,16 @@
         android:text="@string/add_user_button_text"
         android:layout_gravity="top|left" />
     <Button
-        android:id="@+id/verify_user_button"
+        android:id="@+id/delete_user_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/verify_user_button_text"
+        android:text="@string/delete_user_button_text"
+        android:layout_gravity="top|right" />
+    <Button
+            android:id="@+id/verify_user_voice_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/verify_user_voice_button_text"
         android:layout_gravity="center"/>
-    <TextView
-        android:id="@+id/json_response_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="24dp"
-        android:layout_gravity="bottom|center"/>
+
 </FrameLayout>

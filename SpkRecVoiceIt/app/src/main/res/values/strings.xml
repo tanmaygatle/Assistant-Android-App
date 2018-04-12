@@ -1,13 +1,16 @@
 <resources>
-    <string name="app_name">SpkRecVoiceIt</string>
+    <string name="app_name">Butler</string>
     <string name="add_user_button_text">Add User</string>
-    <string name="verify_user_button_text">Verify User</string>
+    <string name="delete_user_button_text">Delete Users</string>
+    <string name="verify_user_voice_button_text">Verify User</string>
     <string name="enter_username_text">Enter Username to register</string>
     <string name="username_text">Username</string>
-    <string name="checkbox_1_text">Permission 1</string>
-    <string name="checkbox_2_text">Permission 2</string>
-    <string name="checkbox_3_text">Permission 3</string>
+    <string name="checkbox_1_text">Call</string>
+    <string name="checkbox_2_text">Mail</string>
+    <string name="checkbox_3_text">Camera</string>
     <string name="create_user_text">Create User</string>
     <string name="enrol_user_text">Enrol User</string>
-    <string name="popup_text">Please repeat the sentence three times.\n\n \"<b>Never forget tomorrow is a new day</b>\" \n\nYou may start each time after the beep</string>
+    <string name="popup_text">Please say the sentence after the beep.\n\n \"<b>Never forget tomorrow is a new day</b>\"</string>
+
+    <string name="what_s_on_your_mind">Enter your query</string>
 </resources>

@@ -43,7 +43,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
     public Cursor getUserData(String userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from users where userId ="+userId+"", null );
+        Cursor res =  db.rawQuery( "select * from users where userId ='"+userId+"'", null );
         return res;
     }
 
@@ -52,9 +52,9 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO users_permissions(userId,pId) VALUES ('"+userId+"','"+pId+"')");
         return true;
     }
-    public Cursor getPermissionData() {
+    public Cursor getPermissionData(int pId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from permissions ", null );
+        Cursor res =  db.rawQuery( "select * from permissions where pId= "+pId+"", null );
         return res;
     }
     public Cursor getPermissionsForUser(String userId) {
@@ -74,11 +74,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor res =  db.rawQuery( "select * from users", null );
         return res;
     }
-    /*public boolean deleteCourseData(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "delete from courseInfo where id="+id+"", null );
-        return true;
-    }*/
+
     public void deleteUser(String userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         db.execSQL("delete from users where userId="+userId+"");
@@ -86,12 +82,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void deleteAllUsers() {
         SQLiteDatabase db = this.getReadableDatabase();
-//        return db.delete("courseInfo", "id = "+id, null);
         db.execSQL("delete from users");
     }
     public void deleteAllPermissions() {
         SQLiteDatabase db = this.getReadableDatabase();
-//        return db.delete("attendanceData", "id = "+id, null);
         db.execSQL("delete from permissions");
     }
 

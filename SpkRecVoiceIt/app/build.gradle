@@ -28,5 +28,15 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:support-v4:27.1.1'
     api 'com.github.voiceittech:VoiceItApi2AndroidSDK:v1.01'
-    api 'com.google.code.gson:gson:2.8.2'
+
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.ibm.watson.developer_cloud:conversation:4.2.1'
+    implementation 'com.ibm.watson.developer_cloud:text-to-speech:4.2.1'
+    implementation 'com.ibm.watson.developer_cloud:speech-to-text:4.2.1'
+    implementation 'com.ibm.watson.developer_cloud:android-sdk:0.4.3'
+    implementation 'com.ibm.mobilefirstplatform.clientsdk.android:analytics:1.1.0'
+    implementation 'com.google.android.gms:play-services:10.0.1'
+    implementation 'com.android.support:multidex:1.0.3'
 }

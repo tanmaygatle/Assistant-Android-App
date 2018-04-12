@@ -7,4 +7,9 @@
     <color name="green">#45BC62</color>
     <color name="orange">#EAAD43</color>
     <color name="white">#FFFFFF</color>
+
+    <!--<color name="colorPrimaryDark">#303f9f</color>-->
+    <color name="bg_bubble_self">#62caa6</color>
+    <color name="bg_bubble_watbot">#ecf0f1</color>
+
 </resources>

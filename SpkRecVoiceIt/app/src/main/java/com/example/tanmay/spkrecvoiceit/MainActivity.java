@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -16,7 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.voiceit.voiceit2.VoiceItAPI2;
@@ -39,9 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean permissionAccepted = false;
 
     private Button mAddUserButton;
-    private Button mVerifyUserButton;
+    private Button mVerifyUserVoiceButton;
     private Button mDeleteUsersButton;
-    private TextView mJSONResponseTextView;
     private String userID;
     private String groupId = "grp_0dce92b2e3e141c194ef3fc2fc39f257";
     private String apiKey = "key_b030846efc8a4335912cad8efea9d539";
@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
         myVoiceIt2 = new VoiceItAPI2(apiKey, apiToken);
         mActivity = this;
-        mJSONResponseTextView = (TextView) findViewById(R.id.json_response_text_view);
 
         mAddUserButton = (Button) findViewById(R.id.add_user_button);
         mAddUserButton.setOnClickListener(new View.OnClickListener() {
@@ -99,8 +98,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        mVerifyUserButton = (Button) findViewById(R.id.verify_user_button);
-        mVerifyUserButton.setOnClickListener(new View.OnClickListener() {
+
+        mVerifyUserVoiceButton = (Button) findViewById(R.id.verify_user_voice_button);
+        mVerifyUserVoiceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,50);
@@ -124,8 +124,17 @@ public class MainActivity extends AppCompatActivity {
 
                             Cursor res = dbHelper.getUserData(response.getString("userId"));
                             res.moveToFirst();
-                            Snackbar.make(findViewById(R.id.main_layout),"User Identified:" + res.getString(res.getColumnIndex("user_name")),Snackbar.LENGTH_LONG);
-                            //mJSONResponseTextView.setText("User Identified:" + res.getString(res.getColumnIndex("user_name")));
+                            Snackbar.make(findViewById(R.id.main_layout),"User Identified:" + res.getString(res.getColumnIndex("user_name")),Snackbar.LENGTH_INDEFINITE).show();
+
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent(MainActivity.this,MainChatBotActivity.class);
+                                    intent.putExtra("userId", userID);
+                                    startActivity(intent);
+                                }
+                            },5000);
                         }
                         catch(Exception e) {
                             e.printStackTrace();
@@ -135,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                         if (errorResponse != null) {
-                            mJSONResponseTextView.setText("JSONResult voiceIdentification: " + errorResponse.toString());
+                            Toast.makeText(MainActivity.this, "JSONResult voiceIdentification: " + errorResponse.toString(),Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -170,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                                     @Override
                                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                                         if (errorResponse != null) {
-                                            mJSONResponseTextView.setText("JSONResult deleteduser: " + errorResponse.toString());
+                                            Toast.makeText(MainActivity.this,"JSONResult deleteduser: " + errorResponse.toString(),Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
@@ -182,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                         if (errorResponse != null) {
-                            mJSONResponseTextView.setText("JSONResult getallusers: " + errorResponse.toString());
+                            Toast.makeText(MainActivity.this,"JSONResult getallusers: " + errorResponse.toString(),Toast.LENGTH_LONG).show();
                         }
                     }
                 });

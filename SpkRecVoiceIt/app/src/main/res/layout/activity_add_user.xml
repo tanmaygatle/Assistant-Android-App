@@ -60,7 +60,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/create_user_button"
             android:text="@string/create_user_text"
-            android:onClick="ShowPopup"
             android:layout_margin="10dp"
             android:background="@drawable/buttonstyle"/>
     </LinearLayout>
