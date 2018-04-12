@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,14 +17,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.voiceit.voiceit2.VoiceItAPI2;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -37,15 +40,15 @@ public class MainActivity extends AppCompatActivity {
 
     private Button mAddUserButton;
     private Button mVerifyUserButton;
+    private Button mDeleteUsersButton;
     private TextView mJSONResponseTextView;
     private String userID;
     private String groupId = "grp_0dce92b2e3e141c194ef3fc2fc39f257";
     private String apiKey = "key_b030846efc8a4335912cad8efea9d539";
     private String apiToken = "tok_ead7e4b09e2b4b27b79280456008ef4c";
-    private boolean groupExists = false;
 
-    private int enrollmentCount = 0;
     private ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+    DBHelper dbHelper = new DBHelper(this);
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -77,136 +80,25 @@ public class MainActivity extends AppCompatActivity {
                     PERMISSIONS_REQUEST_RECORD_AUDIO);
         }
 
+        /*dbHelper.addPermissions(1,"call");
+        dbHelper.addPermissions(2,"camera");
+        dbHelper.addPermissions(3,"mail");*/
+
         myVoiceIt2 = new VoiceItAPI2(apiKey, apiToken);
         mActivity = this;
         mJSONResponseTextView = (TextView) findViewById(R.id.json_response_text_view);
 
-        /*myVoiceIt2.groupExists(groupId, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.d(TAG,"JSONResult groupexists: "+ response.toString());
-                try {
-                    groupExists = (Boolean) response.get("exists");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                if (errorResponse != null) {
-                    mJSONResponseTextView.setText("JSONResult groupExists: " + errorResponse.toString());
-                }
-            }
-        });
-*/
         mAddUserButton = (Button) findViewById(R.id.add_user_button);
         mAddUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddUserActivity.class);
-                /*Gson gson = new Gson();
-                intent.putExtra("myVoiceIt2", gson.toJson(myVoiceIt2));
-                intent.putExtra("groupId", groupId);
-                startActivity(intent);*/
                 intent.putExtra("tokenKey", apiToken);
                 intent.putExtra("apiKey", apiKey);
                 intent.putExtra("groupId", groupId);
                 startActivity(intent);
             }
         });
-        /*mAddUserButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                myVoiceIt2.createUser(new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        Log.d(TAG,"Inside CreateUser : ");
-                        Log.d(TAG,"JSONResult createUser: "+ response.toString());
-                        try {
-                            userID = response.getString("userId");
-                            Log.d(TAG,userID);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        enrollmentCount = 0;
-
-                        myVoiceIt2.addUserToGroup(groupId, userID, new JsonHttpResponseHandler() {
-                            @Override
-                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                Log.d(TAG,"JSONResult addUserToGroup: "+ response.toString());
-
-                                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,50);
-                                myVoiceIt2.createVoiceEnrollment(userID, "en-US", new JsonHttpResponseHandler() {
-                                    @Override
-                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                        Log.d(TAG,"JSONResult createVoiceEnrollment1: "+ response.toString());
-                                        enrollmentCount++;
-
-                                        toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,50);
-                                        myVoiceIt2.createVoiceEnrollment(userID, "en-US", new JsonHttpResponseHandler() {
-                                            @Override
-                                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                                Log.d(TAG,"JSONResult createVoiceEnrollment2: "+ response.toString());
-                                                enrollmentCount++;
-
-                                                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,50);
-                                                myVoiceIt2.createVoiceEnrollment(userID, "en-US", new JsonHttpResponseHandler() {
-                                                    @Override
-                                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                                        Log.d(TAG,"JSONResult createVoiceEnrollment3: "+ response.toString());
-                                                        enrollmentCount++;
-                                                    }
-
-                                                    @Override
-                                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                                                        if (errorResponse != null) {
-                                                            mJSONResponseTextView.setText("JSONResult createVoiceEnrollment3: " + errorResponse.toString());
-                                                        }
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                                                if (errorResponse != null) {
-                                                    mJSONResponseTextView.setText("JSONResult createVoiceEnrollment2: " + errorResponse.toString());
-                                                }
-                                            }
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                                        if (errorResponse != null) {
-                                            mJSONResponseTextView.setText("JSONResult createVoiceEnrollment1: " + errorResponse.toString());
-                                        }
-                                    }
-                                });
-
-                            }
-
-                            @Override
-                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                                if (errorResponse != null) {
-                                    mJSONResponseTextView.setText("JSONResult addUserToGroup: " + errorResponse.toString());
-                                }
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                        if (errorResponse != null) {
-                            mJSONResponseTextView.setText("JSONResult createUser: " + errorResponse.toString());
-                        }
-                    }
-                });
-            }
-        });
-*/
         mVerifyUserButton = (Button) findViewById(R.id.verify_user_button);
         mVerifyUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -216,6 +108,28 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         Log.d(TAG,"JSONResult voiceIdentification: "+ response.toString());
+                        try {
+                            Cursor res1 = dbHelper.getUsers_PermissionsData();
+                            Cursor res2 = dbHelper.getAllUsersData();
+                            res1.moveToFirst();
+                            res2.moveToFirst();
+                            for(int i = 0 ; i < res1.getCount(); i++){
+                                Log.e(TAG, res1.getString(res1.getColumnIndex("userId"))+":"+res1.getString(res1.getColumnIndex("pId")));
+                                res1.moveToNext();
+                            }
+                            for(int i = 0 ; i < res2.getCount(); i++){
+                                Log.e(TAG, res2.getString(res2.getColumnIndex("userId"))+":"+res2.getString(res2.getColumnIndex("user_name")));
+                                res2.moveToNext();
+                            }
+
+                            Cursor res = dbHelper.getUserData(response.getString("userId"));
+                            res.moveToFirst();
+                            Snackbar.make(findViewById(R.id.main_layout),"User Identified:" + res.getString(res.getColumnIndex("user_name")),Snackbar.LENGTH_LONG);
+                            //mJSONResponseTextView.setText("User Identified:" + res.getString(res.getColumnIndex("user_name")));
+                        }
+                        catch(Exception e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
@@ -225,6 +139,52 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
+                });
+            }
+        });
+
+        mDeleteUsersButton = (Button) findViewById(R.id.delete_user_button);
+        mDeleteUsersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myVoiceIt2.getAllUsers(new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        dbHelper.deleteAllUserPermissions();
+                        dbHelper.deleteAllUsers();
+                        Log.d(TAG,"JSONResult getallusers: "+ response.toString());
+                        try {
+                            JSONArray arr = response.getJSONArray("users");
+                            ArrayList<String> strarr = new ArrayList<String>();
+                            for(int i = 0; i < arr.length(); i++) {
+                                strarr.add(arr.getJSONObject(i).getString("userId"));
+                            }
+                            Log.d(TAG,Integer.toString(strarr.size()));
+                            for(int i = 0; i < arr.length(); i++)
+                                myVoiceIt2.deleteUser(strarr.get(i), new JsonHttpResponseHandler() {
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                        Log.d(TAG,"JSONResult deleteduser: "+ response.toString());
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                        if (errorResponse != null) {
+                                            mJSONResponseTextView.setText("JSONResult deleteduser: " + errorResponse.toString());
+                                        }
+                                    }
+                                });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        if (errorResponse != null) {
+                            mJSONResponseTextView.setText("JSONResult getallusers: " + errorResponse.toString());
+                        }
+                    }
                 });
             }
         });
