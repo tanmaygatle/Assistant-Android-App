@@ -13,4 +13,10 @@
     <string name="popup_text">Please say the sentence after the beep.\n\n \"<b>Never forget tomorrow is a new day</b>\"</string>
 
     <string name="what_s_on_your_mind">Enter your query</string>
+    <string name="speech_prompt">Say something!&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device does not support speech input</string>
+    <string name="tap_on_mic">Tap on Mic</string>
+    <string name="permission_denied">You do not have permission</string>
+    <string name="permission_accessed">You have permission</string>
+
 </resources>

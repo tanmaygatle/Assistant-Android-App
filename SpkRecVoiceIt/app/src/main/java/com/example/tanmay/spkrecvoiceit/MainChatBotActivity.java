@@ -1,5 +1,19 @@
 package com.example.tanmay.spkrecvoiceit;
 
+import java.util.ArrayList;
+import java.util.Locale;
+
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.os.Bundle;
+import android.speech.RecognizerIntent;
+import android.view.Menu;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -59,6 +73,7 @@ import static com.ibm.watson.developer_cloud.android.library.audio.MicrophoneHel
 public class MainChatBotActivity extends AppCompatActivity {
 
 
+    private final int REQ_CODE_SPEECH_INPUT = 100;
     private RecyclerView recyclerView;
     private ChatAdapter mAdapter;
     private ArrayList messageArrayList;
@@ -90,59 +105,56 @@ public class MainChatBotActivity extends AppCompatActivity {
     private MicrophoneHelper microphoneHelper;
     private Logger myLogger;
     private String userId ="";
-    private DBHelper dbHelper = new DBHelper(this);
+    private DBHelper dbHelper = new DBHelper(MainChatBotActivity.this);
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_chatbot);
         userId =getIntent().getStringExtra("userId");
         mContext = getApplicationContext();
         conversation_username = mContext.getString(R.string.conversation_username);
         conversation_password = mContext.getString(R.string.conversation_password);
         workspace_id = mContext.getString(R.string.workspace_id);
-        STT_username = mContext.getString(R.string.STT_username);
-        STT_password = mContext.getString(R.string.STT_password);
-        TTS_username = mContext.getString(R.string.TTS_username);
-        TTS_password = mContext.getString(R.string.TTS_password);
-        analytics_APIKEY = mContext.getString(R.string.mobileanalytics_apikey);
+        // STT_username = mContext.getString(R.string.STT_username);
+        //  STT_password = mContext.getString(R.string.STT_password);
+        //     TTS_username = mContext.getString(R.string.TTS_username);
+        //   TTS_password = mContext.getString(R.string.TTS_password);
+        // analytics_APIKEY = mContext.getString(R.string.mobileanalytics_apikey);
+        //   super.onCreate(savedInstanceState);
+        btnRecord= (ImageButton) findViewById(R.id.btn_record);
+
+
+        // hide the action bar
+        //  getActionBar().hide();
+
+
+        btnRecord.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                promptSpeechInput();
+                //  recordMessage();
+
+            }
+        });
+
 
 
         //Bluemix Mobile Analytics
         BMSClient.getInstance().initialize(getApplicationContext(), BMSClient.REGION_US_SOUTH);
         //Analytics is configured to record lifecycle events.
-        Analytics.init(getApplication(), "WatBot", analytics_APIKEY, false, Analytics.DeviceEvent.ALL);
+        //  Analytics.init(getApplication(), "WatBot", analytics_APIKEY, false, Analytics.DeviceEvent.ALL);
         //Analytics.send();
         myLogger = Logger.getLogger("myLogger");
         // Send recorded usage analytics to the Mobile Analytics Service
-        Analytics.send(new ResponseListener() {
-            @Override
-            public void onSuccess(Response response) {
-                // Handle Analytics send success here.
-            }
-
-            @Override
-            public void onFailure(Response response, Throwable throwable, JSONObject jsonObject) {
-                // Handle Analytics send failure here.
-            }
-        });
-
-        // Send logs to the Mobile Analytics Service
-        Logger.send(new ResponseListener() {
-            @Override
-            public void onSuccess(Response response) {
-                // Handle Logger send success here.
-            }
-
-            @Override
-            public void onFailure(Response response, Throwable throwable, JSONObject jsonObject) {
-                // Handle Logger send failure here.
-            }
-        });
 
         inputMessage = (EditText) findViewById(R.id.message);
         btnSend = (ImageButton) findViewById(R.id.btn_send);
-        btnRecord= (ImageButton) findViewById(R.id.btn_record);
+
         String customFont = "Montserrat-Regular.ttf";
         Typeface typeface = Typeface.createFromAsset(getAssets(), customFont);
         inputMessage.setTypeface(typeface);
@@ -150,7 +162,6 @@ public class MainChatBotActivity extends AppCompatActivity {
 
         messageArrayList = new ArrayList<>();
         mAdapter = new ChatAdapter(messageArrayList);
-        microphoneHelper = new MicrophoneHelper(this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
@@ -162,9 +173,6 @@ public class MainChatBotActivity extends AppCompatActivity {
         sendMessage();
 
 
-        //Watson Text-to-Speech Service on Bluemix
-        textToSpeech = new TextToSpeech();
-        textToSpeech.setUsernameAndPassword(TTS_username, TTS_password);
 
 
         int permission = ContextCompat.checkSelfPermission(this,
@@ -202,7 +210,7 @@ public class MainChatBotActivity extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, int position) {
-                recordMessage();
+                promptSpeechInput();
 
             }
         }));
@@ -218,12 +226,41 @@ public class MainChatBotActivity extends AppCompatActivity {
 
         btnRecord.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
-                recordMessage();
+                promptSpeechInput();
             }
         });
     };
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                getString(R.string.speech_prompt));
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.speech_not_supported),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    // Speech-to-Text Record Audio permission
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == RESULT_OK && null != data) {
+
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    inputMessage.setText(result.get(0));
+                }
+                break;
+            }
+
+        }
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -250,7 +287,7 @@ public class MainChatBotActivity extends AppCompatActivity {
                 }
             }
         }
-       // if (!permissionToRecordAccepted ) finish();
+        // if (!permissionToRecordAccepted ) finish();
 
     }
 
@@ -320,11 +357,12 @@ public class MainChatBotActivity extends AppCompatActivity {
                                 String action=    inputres.substring(1,inputres.indexOf(' '));
                                 String name = inputres.substring(inputres.indexOf(' ')+1);
                                 ArrayList permname = new ArrayList<>();
+                                //      fsmid = new ArrayList<>();//branch = new ArrayList<>();
 
                                 Cursor res = dbHelper.getPermissionsForUser(userId);
                                 res.moveToFirst();
                                 for(int i = 0 ; i < res.getCount(); i++) {
-                                    int pid=  res.getInt(res.getColumnIndex("pId"));
+                                    int pid=  res.getInt(res.getColumnIndex("pid"));
                                     Cursor perm = dbHelper.getPermissionData(pid);
                                     for(int j=0; j<perm.getCount(); j++) {
                                         permname.add(perm.getString(perm.getColumnIndex("permission_name")));
@@ -332,32 +370,32 @@ public class MainChatBotActivity extends AppCompatActivity {
                                     }
                                     res.moveToNext();
                                 }
-                                if(permname.contains(action))
-                                if(action.equals("call")&& permname.contains("call")){
+                                if(permname.contains(action)) {
+                                    if (action.equals("call") && permname.contains("call")) {
+                                        messageArrayList.add(R.string.permission_accessed);
 
-
+                                    } else if (action.equals("camera") && permname.contains("camera")) {
+                                        messageArrayList.add(R.string.permission_accessed);
+                                        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                                        startActivity(intent);
+                                    } else if (action.equals("mail")) {
+                                        if (permname.contains("mail")) {
+                                            messageArrayList.add(R.string.permission_accessed);
+                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            Uri data = Uri.parse("mailto:?subject=" + " " + "&body=" + " ");
+                                            intent.setData(data);
+                                            startActivity(intent);
+                                        }
+                                    }
+                                    else
+                                        messageArrayList.add(R.string.permission_denied);
                                 }
-                                if(action.equals("camera")&& permname.contains("camera")){
-                                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                                    startActivity(intent);
-                                }
-                                if(action.equals("mail") && permname.contains("mail")){
-                                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                                    Uri data = Uri.parse("mailto:?subject=" + " " + "&body=" + " ");
-                                    intent.setData(data);
-                                    startActivity(intent);
-
-                                }
-
-
-
-
                             }
                             else{
                                 messageArrayList.add(outMessage);
                             }
 
-                      //      messageArrayList.add(outMessage);
+                            //      messageArrayList.add(outMessage);
                         }
 
                         runOnUiThread(new Runnable() {
@@ -443,9 +481,9 @@ public class MainChatBotActivity extends AppCompatActivity {
     //Private Methods - Speech to Text
     private RecognizeOptions getRecognizeOptions() {
         return new RecognizeOptions.Builder()
-               // .continuous(true)
+                // .continuous(true)
                 .contentType(ContentType.OPUS.toString())
-              //  .model("en-UK_NarrowbandModel")
+                //  .model("en-UK_NarrowbandModel")
                 .interimResults(true)
                 .inactivityTimeout(2000)
                 //TODO: Uncomment this to enable Speaker Diarization
@@ -457,15 +495,7 @@ public class MainChatBotActivity extends AppCompatActivity {
     private class MicrophoneRecognizeDelegate implements RecognizeCallback {
         @Override
         public void onTranscription(SpeechResults speechResults) {
-            //TODO: Uncomment this to enable Speaker Diarization
-          /*  recoTokens = new SpeakerLabelsDiarization.RecoTokens();
-            if(speechResults.getSpeakerLabels() !=null)
-            {
-                recoTokens.add(speechResults);
-                Log.i("SPEECHRESULTS",speechResults.getSpeakerLabels().get(0).toString());
 
-
-            }*/
             if(speechResults.getResults() != null && !speechResults.getResults().isEmpty()) {
                 String text = speechResults.getResults().get(0).getAlternatives().get(0).getTranscript();
                 showMicText(text);
@@ -529,6 +559,5 @@ public class MainChatBotActivity extends AppCompatActivity {
 
 
 }
-
 
 

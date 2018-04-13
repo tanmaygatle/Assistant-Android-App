@@ -38,7 +38,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public boolean addPermissions(int pId, String permission_name){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("INSERT INTO permissions(pId, permission_name) VALUES ('"+pId+"','"+permission_name+"')");
+        db.execSQL("INSERT INTO permissions(pId, permission_name) VALUES ("+pId+",'"+permission_name+"')");
         return true;
     }
     public Cursor getUserData(String userId) {
@@ -49,7 +49,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public boolean addUsers_Permissions(String userId, int pId){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("INSERT INTO users_permissions(userId,pId) VALUES ('"+userId+"','"+pId+"')");
+        db.execSQL("INSERT INTO users_permissions(userId,pId) VALUES ('"+userId+"',"+pId+")");
         return true;
     }
     public Cursor getPermissionData(int pId) {
@@ -59,7 +59,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
     public Cursor getPermissionsForUser(String userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from users_permissions where userId="+userId+"", null );
+        Cursor res =  db.rawQuery( "select * from users_permissions where userId='"+userId+"'", null );
         return res;
     }
 
@@ -77,7 +77,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void deleteUser(String userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        db.execSQL("delete from users where userId="+userId+"");
+        db.execSQL("delete from users where userId='"+userId+"'");
+    }
+
+    public void deleteUserPermissions(String userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("delete from users_permissions where userId='"+userId+"'");
     }
 
     public void deleteAllUsers() {

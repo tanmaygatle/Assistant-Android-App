@@ -20,9 +20,11 @@
         android:layout_gravity="top|right" />
     <Button
             android:id="@+id/verify_user_voice_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/verify_user_voice_button_text"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+
+        android:background="@drawable/round_button"
+
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
 
 </FrameLayout>

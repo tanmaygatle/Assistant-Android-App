@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/colorAccent"/>
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/mic_icon"
+        android:bottom="90dp"
+        android:left="90dp"
+        android:right="90dp"
+        android:top="90dp"/>
+</layer-list>

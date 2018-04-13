@@ -2,6 +2,7 @@ package com.example.tanmay.spkrecvoiceit;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 0;
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
+    private static final int PERMISSIONS_REQUEST_CAMERA = 2;
     private static final String TAG = "MainActivity";
     private boolean permissionAccepted = false;
 
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode){
             case PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
             case PERMISSIONS_REQUEST_RECORD_AUDIO:
+            case PERMISSIONS_REQUEST_CAMERA:
                 permissionAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
         }
@@ -78,6 +81,12 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
                     PERMISSIONS_REQUEST_RECORD_AUDIO);
+        }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
         }
 
         /*dbHelper.addPermissions(1,"call");
@@ -134,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                                     intent.putExtra("userId", userID);
                                     startActivity(intent);
                                 }
-                            },5000);
+                            },3000);
                         }
                         catch(Exception e) {
                             e.printStackTrace();
@@ -156,7 +165,12 @@ public class MainActivity extends AppCompatActivity {
         mDeleteUsersButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                myVoiceIt2.getAllUsers(new JsonHttpResponseHandler() {
+
+                Intent intent = new Intent(MainActivity.this, DeleteUserActivity.class);
+                intent.putExtra("tokenKey", apiToken);
+                intent.putExtra("apiKey", apiKey);
+                startActivity(intent);
+                /*myVoiceIt2.getAllUsers(new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         dbHelper.deleteAllUserPermissions();
@@ -194,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this,"JSONResult getallusers: " + errorResponse.toString(),Toast.LENGTH_LONG).show();
                         }
                     }
-                });
+                });*/
             }
         });
     }
