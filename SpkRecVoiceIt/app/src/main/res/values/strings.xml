@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Butler</string>
     <string name="add_user_button_text">Add User</string>
-    <string name="delete_user_button_text">Delete Users</string>
+    <string name="delete_user_button_text">Delete User</string>
     <string name="verify_user_voice_button_text">Verify User</string>
     <string name="enter_username_text">Enter Username to register</string>
     <string name="username_text">Username</string>

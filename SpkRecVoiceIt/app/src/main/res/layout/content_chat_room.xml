@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.vmac.WatBot.MainChatBotActivity"
+    tools:context="com.example.tanmay.spkrecvoiceit.MainChatBotActivity"
     tools:showIn="@layout/activity_main_chatbot">
 
     <android.support.v7.widget.RecyclerView

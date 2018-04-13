@@ -60,22 +60,12 @@ public class AddUserActivity extends AppCompatActivity{
                     Snackbar.make(findViewById(R.id.ScrollView01), "The Username must contain only alphanumeric characters", Snackbar.LENGTH_LONG).show();
             }
         });
-
     }
 
     public void ShowPopup(View v) {
-        TextView mTxtClose;
         final Button mEnrolButton;
         enrolDialog.setContentView(R.layout.popup_user_enrol);
-        mTxtClose =(TextView) enrolDialog.findViewById(R.id.txtclose);
         mEnrolButton = (Button) enrolDialog.findViewById(R.id.enrol_button);
-
-        mTxtClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                enrolDialog.dismiss();
-            }
-        });
 
         mEnrolButton.setOnClickListener(new View.OnClickListener() {
             @Override

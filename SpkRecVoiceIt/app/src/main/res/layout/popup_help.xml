@@ -7,7 +7,7 @@
     android:layout_height="300dp"
     android:background="@color/grey"
     android:padding="5dp"
-    android:id="@+id/popup_layout"
+    android:id="@+id/popup_layout_help"
     android:layout_gravity="center">
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,18 +17,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/popup_text"
+            android:text="First add yourself as a user with appropriate permissions. Then verify and continue to chatbot"
             android:textSize="18sp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"/>
-        <Button
-            android:id="@+id/enrol_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/enrol_user_text"
-            android:layout_marginTop="50dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/buttonstyle"
-            android:textColor="@drawable/mr_ic_close_dark"/>
     </LinearLayout>
 </LinearLayout>

@@ -9,12 +9,16 @@
     android:id="@+id/ScrollView01"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical">
+    android:scrollbars="vertical"
+    android:background="@color/white">
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:orientation="vertical"
-        android:layout_height="fill_parent"
-        android:gravity="center">
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp">
 
         <TextView
             android:id="@+id/enter_username_text_view"
@@ -22,8 +26,7 @@
             android:layout_height="wrap_content"
             android:text="@string/enter_username_text"
             android:textSize="10pt"
-            android:layout_margin="5dp"
-            >
+            android:layout_margin="5dp">
         </TextView>
         <EditText
             android:id="@+id/name_edit_text"
@@ -60,7 +63,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/create_user_button"
             android:text="@string/create_user_text"
-            android:layout_margin="10dp"
-            android:background="@drawable/buttonstyle"/>
+            android:layout_marginTop="50dp"
+            android:background="@drawable/buttonstyle"
+            android:textColor="@drawable/mr_ic_close_dark"/>
     </LinearLayout>
 </ScrollView>
