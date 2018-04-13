@@ -30,6 +30,7 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
+
     public boolean addUser(String userId, String user_name){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("INSERT INTO users(userId, user_name) VALUES ('"+userId+"','"+user_name+"')");
@@ -54,9 +55,22 @@ public class DBHelper extends SQLiteOpenHelper {
     }
     public Cursor getPermissionData(int pId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from permissions where pId= "+pId+"", null );
+        Cursor res =  db.rawQuery( "select * from permissions where pId= "+pId, null );
         return res;
     }
+
+    public Cursor getAllPermissions() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from permissions", null );
+        return res;
+    }
+
+    public void dropPermissionsTable() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS permissions");
+        db.execSQL("CREATE TABLE IF NOT EXISTS permissions (pId integer primary key, permission_name varchar)");
+    }
+
     public Cursor getPermissionsForUser(String userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  db.rawQuery( "select * from users_permissions where userId='"+userId+"'", null );

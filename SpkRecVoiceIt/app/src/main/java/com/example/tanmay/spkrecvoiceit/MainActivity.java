@@ -81,6 +81,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
        // dbHelper.deleteAllUsers();
        // dbHelper.deleteAllUserPermissions();
+        /*dbHelper.dropPermissionsTable();
+        dbHelper.addPermissions(1,"call");
+        dbHelper.addPermissions(2,"camera");
+        dbHelper.addPermissions(3,"mail");
+*/
+        Cursor res = dbHelper.getAllPermissions();
+        Cursor res2 = dbHelper.getAllUsersData();
+        res.moveToFirst();
+        res2.moveToFirst();
+       // Cursor res3 = dbHelper.getAllUsersData();
+        for (int i =0; i< res.getCount();i++){
+            Log.d(TAG, "res"+ res.getString(res.getColumnIndex("pId")));
+            Log.d(TAG, "res"+ res.getString(res.getColumnIndex("permission_name")));
+            res.moveToNext();
+        }
+
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -99,10 +115,6 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
                     PERMISSIONS_REQUEST_CAMERA);
         }
-
-        /*dbHelper.addPermissions(1,"call");
-        dbHelper.addPermissions(2,"camera");
-        dbHelper.addPermissions(3,"mail");*/
 
         myVoiceIt2 = new VoiceItAPI2(apiKey, apiToken);
         mActivity = this;

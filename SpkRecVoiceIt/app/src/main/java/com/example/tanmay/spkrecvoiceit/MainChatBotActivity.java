@@ -3,11 +3,16 @@ package com.example.tanmay.spkrecvoiceit;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.RecognizerIntent;
+import android.support.annotation.RequiresApi;
+import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
@@ -57,7 +62,7 @@ import com.ibm.watson.developer_cloud.speech_to_text.v1.model.RecognizeOptions;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeakerLabel;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechResults;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.websocket.RecognizeCallback;
-import com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech;
+//import com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech;
 import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voice;
 
 
@@ -66,6 +71,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static com.ibm.watson.developer_cloud.android.library.audio.MicrophoneHelper.REQUEST_PERMISSION;
 
@@ -90,7 +96,8 @@ public class MainChatBotActivity extends AppCompatActivity {
     private static final int RECORD_REQUEST_CODE = 101;
     private boolean listening = false;
     private SpeechToText speechService;
-    private TextToSpeech textToSpeech;
+    private com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech textToSpeech;
+    private android.speech.tts.TextToSpeech tts;
     private MicrophoneInputStream capture;
     private Context mContext;
     private String workspace_id;
@@ -106,6 +113,8 @@ public class MainChatBotActivity extends AppCompatActivity {
     private Logger myLogger;
     private String userId ="";
     private DBHelper dbHelper = new DBHelper(MainChatBotActivity.this);
+   // private Context context1;
+
 
 
 
@@ -115,6 +124,7 @@ public class MainChatBotActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_chatbot);
         userId =getIntent().getStringExtra("userId");
+     //   context1= (Context)this.context;
 
         Log.d(TAG,userId);
 
@@ -234,6 +244,17 @@ public class MainChatBotActivity extends AppCompatActivity {
             }
         });
     };
+    public void stopTTS() {
+        if(tts !=null){
+            tts.stop();
+            tts.shutdown();
+            tts = null;
+        }
+    }
+
+    public boolean isTTSPlaying() {
+        return (tts != null);
+	}
     private void promptSpeechInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -259,6 +280,10 @@ public class MainChatBotActivity extends AppCompatActivity {
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     inputMessage.setText(result.get(0));
+                    if(checkInternetConnection()) {
+                    	sendMessage();
+                }
+                    
                 }
                 break;
             }
@@ -301,7 +326,27 @@ public class MainChatBotActivity extends AppCompatActivity {
                 MicrophoneHelper.REQUEST_PERMISSION);
     }
 
+
     // Sending a message to Watson Conversation Service
+    public void startTTS(final String input) {
+        tts=new android.speech.tts.TextToSpeech(MainChatBotActivity.this, new android.speech.tts.TextToSpeech.OnInitListener() {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onInit(final int status) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        tts.speak(input, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null);
+                     }
+
+
+                }, 500);
+            }
+        });
+}
     private void sendMessage() {
 
         final String inputmessage = this.inputMessage.getText().toString().trim();
@@ -325,7 +370,7 @@ public class MainChatBotActivity extends AppCompatActivity {
 
         this.inputMessage.setText("");
         mAdapter.notifyDataSetChanged();
-
+	
 
         Thread thread = new Thread(new Runnable(){
             public void run() {
@@ -347,6 +392,7 @@ public class MainChatBotActivity extends AppCompatActivity {
                     }
                     Message outMessage=new Message();
                     String inp="";
+                    
                     if(response!=null)
                     {
                         if(response.getOutput()!=null && response.getOutput().containsKey("text"))
@@ -371,20 +417,20 @@ public class MainChatBotActivity extends AppCompatActivity {
                                 String action=    inputres.substring(1,inputres.lastIndexOf('_'));
                                 String name = inputres.substring(inputres.indexOf(' ')+1);
                                 ArrayList permname = new ArrayList<>();
-//                                      fsmid = new ArrayList<>();//branch = new ArrayList<>();
 
                                 Cursor res = dbHelper.getPermissionsForUser(userId);
                                 res.moveToFirst();
-                                Log.d(TAG, "THIRD");
+                                Log.d(TAG, res.toString());
                                 for(int i = 0 ; i < res.getCount(); i++) {
                                     int pid=  res.getInt(res.getColumnIndex("pId"));
+                                    Log.d(TAG,"PID VALUE"+ pid);
                                     Cursor perm = dbHelper.getPermissionData(pid);
-                                    for(int j=0; j<perm.getCount(); j++) {
-                                        permname.add(perm.getString(perm.getColumnIndex("permission_name")));
-                                        perm.moveToNext();
-                                    }
+                                    Log.d(TAG, perm.toString());
+                                    perm.moveToFirst();
+                                    permname.add(perm.getString(perm.getColumnIndex("permission_name")));
                                     res.moveToNext();
                                 }
+                                Log.d( TAG, permname.toString());
                                 outMessage.setMessage("You have permission");
                                 if (action.equals("call") && permname.contains("call")) {
                                     outMessage.setMessage("You have permission");
@@ -406,17 +452,17 @@ public class MainChatBotActivity extends AppCompatActivity {
                                     startActivity(intent);
 
                                 }else {
+                                	startTTS("You do not have permission");
                                     outMessage.setMessage("You do not have permission");
                                     messageArrayList.add(outMessage);
                                 }
                             }
                             else{
-                                Log.d(TAG, "FOUR");
 
+                                startTTS(outMessage.getMessage());
                                 messageArrayList.add(outMessage);
                             }
 
-                            //      messageArrayList.add(outMessage);
                         }
 
                         runOnUiThread(new Runnable() {
