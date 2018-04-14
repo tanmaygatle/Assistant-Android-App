@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -53,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
     private Button mHelpButton;
     private String userID;
     private String groupId = "grp_0dce92b2e3e141c194ef3fc2fc39f257";
-    private String apiKey = "key_b030846efc8a4335912cad8efea9d539";
-    private String apiToken = "tok_ead7e4b09e2b4b27b79280456008ef4c";
+//    private String apiKey = "key_b030846efc8a4335912cad8efea9d539";
+    private String apiKey = "key_b93e550d3a8849a68de34cf408c81ae4";
+//    private String apiToken = "tok_ead7e4b09e2b4b27b79280456008ef4c";
+    private String apiToken = "tok_57506083aa2c42628d4c6e781804a414";
 
     private Dialog popupDialog;
 
@@ -79,24 +82,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       // dbHelper.deleteAllUsers();
-       // dbHelper.deleteAllUserPermissions();
-        /*dbHelper.dropPermissionsTable();
-        dbHelper.addPermissions(1,"call");
+        /*dbHelper.addPermissions(1,"call");
         dbHelper.addPermissions(2,"camera");
-        dbHelper.addPermissions(3,"mail");
-*/
-        Cursor res = dbHelper.getAllPermissions();
-        Cursor res2 = dbHelper.getAllUsersData();
-        res.moveToFirst();
-        res2.moveToFirst();
-       // Cursor res3 = dbHelper.getAllUsersData();
-        for (int i =0; i< res.getCount();i++){
-            Log.d(TAG, "res"+ res.getString(res.getColumnIndex("pId")));
-            Log.d(TAG, "res"+ res.getString(res.getColumnIndex("permission_name")));
-            res.moveToNext();
-        }
-
+        dbHelper.addPermissions(3,"mail");*/
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -120,6 +108,45 @@ public class MainActivity extends AppCompatActivity {
         mActivity = this;
 
         popupDialog = new Dialog(this);
+
+        SharedPreferences settings = getSharedPreferences("PREFS", 0);
+        groupId = settings.getString("groupId", "");
+
+        if(groupId.equals("")) {
+            myVoiceIt2.createGroup("Users", new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Log.d(TAG,"JSONResult groupCreated: "+ response.toString());
+                    try {
+                        Log.d(TAG, "Added groupId to sharedPrefs");
+                        SharedPreferences settings = getSharedPreferences("PREFS", 0);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString("groupId",response.getString("groupId"));
+                        groupId = response.getString("groupId");
+                        editor.apply();
+                    }
+                    catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    if (errorResponse != null) {
+                        Toast.makeText(MainActivity.this, "JSONResult groupCreation: " + errorResponse.toString(),Toast.LENGTH_LONG).show();
+                    }
+                }
+
+            });
+        }
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Wait");
+            }
+        }, 1000);
 
         mAddUserButton = (Button) findViewById(R.id.add_user_button);
         mAddUserButton.setOnClickListener(new View.OnClickListener() {
@@ -257,13 +284,14 @@ public class MainActivity extends AppCompatActivity {
             mEnterButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d(TAG, "hello   "+password.getText().toString());
                     if(password.getText().toString().equals("1234")) {
+                        popupDialog.dismiss();
                         Intent intent = new Intent(MainActivity.this, AddUserActivity.class);
                         intent.putExtra("tokenKey", apiToken);
                         intent.putExtra("apiKey", apiKey);
                         intent.putExtra("groupId", groupId);
                         startActivity(intent);
+
                     }
                     else {
                         Toast.makeText(v.getContext(),"Incorrect Password",Toast.LENGTH_LONG).show();
@@ -277,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     if(password.getText().toString().equals("1234")) {
+                        popupDialog.dismiss();
                         Intent intent = new Intent(MainActivity.this, DeleteUserActivity.class);
                         intent.putExtra("tokenKey", apiToken);
                         intent.putExtra("apiKey", apiKey);

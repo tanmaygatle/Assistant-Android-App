@@ -451,6 +451,19 @@ public class MainChatBotActivity extends AppCompatActivity {
                                     intent.setData(data);
                                     startActivity(intent);
 
+                                }
+                                else if (action.equals("exit")) {
+                                    outMessage.setMessage("Bye");
+                                    messageArrayList.add(outMessage);
+
+                                    Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            finish();
+                                        }
+                                    }, 1000);
+
                                 }else {
                                 	startTTS("You do not have permission");
                                     outMessage.setMessage("You do not have permission");
