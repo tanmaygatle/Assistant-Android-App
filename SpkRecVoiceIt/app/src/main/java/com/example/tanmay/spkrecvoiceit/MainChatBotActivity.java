@@ -115,6 +115,9 @@ public class MainChatBotActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_chatbot);
         userId =getIntent().getStringExtra("userId");
+
+        Log.d(TAG,userId);
+
         mContext = getApplicationContext();
         conversation_username = mContext.getString(R.string.conversation_username);
         conversation_password = mContext.getString(R.string.conversation_password);
@@ -125,6 +128,7 @@ public class MainChatBotActivity extends AppCompatActivity {
         //   TTS_password = mContext.getString(R.string.TTS_password);
         // analytics_APIKEY = mContext.getString(R.string.mobileanalytics_apikey);
         //   super.onCreate(savedInstanceState);
+
         btnRecord= (ImageButton) findViewById(R.id.btn_record);
 
 
@@ -322,6 +326,7 @@ public class MainChatBotActivity extends AppCompatActivity {
         this.inputMessage.setText("");
         mAdapter.notifyDataSetChanged();
 
+
         Thread thread = new Thread(new Runnable(){
             public void run() {
                 try {
@@ -341,6 +346,7 @@ public class MainChatBotActivity extends AppCompatActivity {
 
                     }
                     Message outMessage=new Message();
+                    String inp="";
                     if(response!=null)
                     {
                         if(response.getOutput()!=null && response.getOutput().containsKey("text"))
@@ -349,20 +355,29 @@ public class MainChatBotActivity extends AppCompatActivity {
                             ArrayList responseList = (ArrayList) response.getOutput().get("text");
                             if(null !=responseList && responseList.size()>0){
                                 outMessage.setMessage((String)responseList.get(0));
+                                inp =(String)responseList.get(0);
                                 outMessage.setId("2");
                             }
+                            Log.d(TAG,  userId);
+                            Cursor res3 = dbHelper.getUserData(userId);
+                            res3.moveToFirst();
+                           String Username = res3.getString(res3.getColumnIndex("user_name"));
+                            inp = inp.replace("$$",Username);
+                            outMessage.setMessage(inp);
                             Log.d(TAG, (String)responseList.get(0));
                             String inputres = (String)responseList.get(0);
+                            Log.d(TAG, "second");
                             if(inputres.charAt(0)=='_'){
-                                String action=    inputres.substring(1,inputres.indexOf(' '));
+                                String action=    inputres.substring(1,inputres.lastIndexOf('_'));
                                 String name = inputres.substring(inputres.indexOf(' ')+1);
                                 ArrayList permname = new ArrayList<>();
-                                //      fsmid = new ArrayList<>();//branch = new ArrayList<>();
+//                                      fsmid = new ArrayList<>();//branch = new ArrayList<>();
 
                                 Cursor res = dbHelper.getPermissionsForUser(userId);
                                 res.moveToFirst();
+                                Log.d(TAG, "THIRD");
                                 for(int i = 0 ; i < res.getCount(); i++) {
-                                    int pid=  res.getInt(res.getColumnIndex("pid"));
+                                    int pid=  res.getInt(res.getColumnIndex("pId"));
                                     Cursor perm = dbHelper.getPermissionData(pid);
                                     for(int j=0; j<perm.getCount(); j++) {
                                         permname.add(perm.getString(perm.getColumnIndex("permission_name")));
@@ -370,28 +385,34 @@ public class MainChatBotActivity extends AppCompatActivity {
                                     }
                                     res.moveToNext();
                                 }
-                                if(permname.contains(action)) {
-                                    if (action.equals("call") && permname.contains("call")) {
-                                        messageArrayList.add(R.string.permission_accessed);
+                                outMessage.setMessage("You have permission");
+                                if (action.equals("call") && permname.contains("call")) {
+                                    outMessage.setMessage("You have permission");
+                                    messageArrayList.add(outMessage);
+                                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                                    intent.setData(Uri.parse("tel:"));
+                                    startActivity(intent);
 
-                                    } else if (action.equals("camera") && permname.contains("camera")) {
-                                        messageArrayList.add(R.string.permission_accessed);
-                                        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                                        startActivity(intent);
-                                    } else if (action.equals("mail")) {
-                                        if (permname.contains("mail")) {
-                                            messageArrayList.add(R.string.permission_accessed);
-                                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                                            Uri data = Uri.parse("mailto:?subject=" + " " + "&body=" + " ");
-                                            intent.setData(data);
-                                            startActivity(intent);
-                                        }
-                                    }
-                                    else
-                                        messageArrayList.add(R.string.permission_denied);
+                                } else if (action.equals("camera") && permname.contains("camera")) {
+                                    messageArrayList.add(outMessage);
+                                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                                    startActivity(intent);
+                                } else if (action.equals("mail") && permname.contains("mail")) {
+
+                                    messageArrayList.add(outMessage);
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    Uri data = Uri.parse("mailto:?subject=" + " " + "&body=" + " ");
+                                    intent.setData(data);
+                                    startActivity(intent);
+
+                                }else {
+                                    outMessage.setMessage("You do not have permission");
+                                    messageArrayList.add(outMessage);
                                 }
                             }
                             else{
+                                Log.d(TAG, "FOUR");
+
                                 messageArrayList.add(outMessage);
                             }
 
